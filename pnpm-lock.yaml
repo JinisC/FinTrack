@@ -10,6 +10,9 @@ importers:
 
   apps/finance-service:
     dependencies:
+      '@fintrack/nest-observability':
+        specifier: workspace:*
+        version: link:../../libs/nest-observability
       '@fintrack/shared-types':
         specifier: workspace:*
         version: link:../../libs/shared-types
@@ -122,8 +125,38 @@ importers:
       '@types/node':
         specifier: ^24.19.0
         version: 24.19.0
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.0
       typescript:
         specifier: ^6.0.3
+        version: 6.0.3
+
+  libs/nest-observability:
+    devDependencies:
+      '@nestjs/common':
+        specifier: ^12.0.1
+        version: 12.1.1(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^12.0.1
+        version: 12.1.1(@nestjs/common@12.1.1(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@12.1.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@prometheus-io/client':
+        specifier: ^0.16.1
+        version: 0.16.1
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+      typescript:
+        specifier: ^6.0.2
         version: 6.0.3
 
   libs/shared-types:

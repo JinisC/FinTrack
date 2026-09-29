@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { createCache } from 'cache-manager';
 import type { CoinGeckoClient } from '../coingecko/coingecko.client.js';
 import { CoinGeckoError, type CoinGeckoMarket } from '../coingecko/coingecko.types.js';
+import { MetricsRegistry } from '@fintrack/nest-observability';
 import { MetricsService } from '../metrics/metrics.service.js';
 import { PricesService } from './prices.service.js';
 
@@ -30,7 +31,7 @@ describe('PricesService', () => {
   beforeEach(() => {
     coingecko = { getMarkets: vi.fn(), getMarketChart: vi.fn(), getSimplePrices: vi.fn() };
     cache = createCache() as Cache;
-    metrics = new MetricsService();
+    metrics = new MetricsService(new MetricsRegistry());
     service = new PricesService(
       coingecko as unknown as CoinGeckoClient,
       cache,

@@ -9,6 +9,7 @@ import {
 
 export default defineConfig({
   testDir: './tests',
+  globalSetup: './support/global-setup.ts',
   // De tests delen één service en één mock (met omschakelbare storingsmodus): serieel draaien.
   fullyParallel: false,
   workers: 1,
