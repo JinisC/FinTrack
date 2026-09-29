@@ -59,7 +59,7 @@ Communicatie tussen frontend en backend via REST + WebSockets (live updates voor
 | Hosting backend | **Render** (free web services) | Nog een van de weinige écht gratis tiers; spin-down na 15 min inactiviteit is een bekende, vermeldbare beperking |
 | Hosting frontend | **Vercel** of **GitHub Pages** | Statische hosting, geen spin-down, gratis |
 | Version control | **GitHub** (feature branches + PR's + Issues/Projects) | Vereiste; commit-discipline en PR-geschiedenis zijn zelf CV-materiaal |
-| Testing | Jest/Jasmine (unit) + Playwright of Cypress (e2e) | Onderscheidt een portfolio-project met testdiscipline |
+| Testing | Vitest (unit, NestJS-standaard sinds v12) + Playwright (API- en e2e-tests) | Onderscheidt een portfolio-project met testdiscipline; één e2e-tool voor backend én frontend |
 
 ### Backend-alternatieven (indien niet TypeScript)
 - **.NET (C#/ASP.NET Core)** — sterk getypeerd, populair in Benelux-bedrijven, Entity Framework voor relationele data

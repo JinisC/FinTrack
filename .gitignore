@@ -8,6 +8,7 @@ dist/
 build/
 .angular/
 .nest/
+*.tsbuildinfo
 
 # Environment
 .env
