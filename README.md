@@ -30,11 +30,17 @@ fintrack/
 
 ## Lokaal draaien
 
-Vereisten: **Node 22+** (zie `.nvmrc`) en **pnpm 10**.
+Vereisten: **Node 22+** (zie `.nvmrc`), **pnpm 10** en **Docker Desktop** (voor Postgres).
 
 ```bash
 pnpm install
-pnpm --filter @fintrack/finance-service start:dev   # http://localhost:3000
+cp apps/finance-service/.env.example apps/finance-service/.env
+
+pnpm db:up                                           # Postgres 17 in Docker
+pnpm --filter @fintrack/finance-service db:deploy    # migraties toepassen
+pnpm --filter @fintrack/finance-service db:seed      # demo-gebruiker + voorbeeld-portfolio (optioneel)
+
+pnpm --filter @fintrack/finance-service start:dev    # http://localhost:3000
 ```
 
 Configuratie via omgevingsvariabelen of een `.env` in `apps/finance-service/` — zie [`.env.example`](apps/finance-service/.env.example). Een gratis CoinGecko Demo-key (`COINGECKO_API_KEY`) is optioneel maar voorkomt snel rate-limiting.
@@ -45,23 +51,32 @@ Configuratie via omgevingsvariabelen of een `.env` in `apps/finance-service/` �
 |---|---|
 | `GET /api/prices?limit=20` | Top-coins op marktkapitalisatie (limit 1–50) |
 | `GET /api/prices/:id/history?days=7` | Prijshistoriek van één coin (days: 1, 7, 14, 30, 90, 365) |
-| `GET /health` | Status van de service + CoinGecko (`ok` / `degraded`) |
+| `GET /api/portfolio` | Portfolio met actuele waarde en winst/verlies per entry en in totaal |
+| `POST /api/portfolio/entries` | Aankoop toevoegen (`coinId`, `amount`, `buyPriceUsd`, `boughtAt`, `note?`) |
+| `PATCH /api/portfolio/entries/:id` | Aankoop wijzigen |
+| `DELETE /api/portfolio/entries/:id` | Aankoop verwijderen |
+| `GET /health` | Status van database + CoinGecko (`ok` / `degraded` / `down`) |
 | `GET /metrics` | Prometheus-metrics (HTTP, CoinGecko, cache, Node-runtime) |
 
-Prijsdata wordt 60s gecachet. Faalt CoinGecko (bv. rate limit), dan krijg je de laatst bekende data terug met `"stale": true`, of `503` als die er niet is.
+- Prijsdata wordt 60s gecachet. Faalt CoinGecko (bv. rate limit), dan krijg je de laatst bekende data terug met `"stale": true`, of `503` als die er niet is. De portfolio blijft dan zichtbaar, zonder waardering.
+- Zolang er geen authenticatie is, horen alle portfolio-requests bij een vaste demo-gebruiker.
+- `/health` geeft `503` als de database onbereikbaar is; een CoinGecko-storing geeft `degraded` met `200`.
 
 ### Scripts
 
 | Commando | Doel |
 |---|---|
+| `pnpm db:up` / `pnpm db:down` | Postgres-container starten / stoppen |
 | `pnpm build` | Build van libs en apps |
 | `pnpm test` | Unit tests (Vitest) |
-| `pnpm test:e2e` | API-tests (Playwright) tegen een CoinGecko-mock |
+| `pnpm test:e2e` | API-tests (Playwright) tegen een CoinGecko-mock en de database `fintrack_e2e` (vereist `pnpm db:up`) |
 | `pnpm lint` / `pnpm typecheck` | Oxlint / TypeScript-controle |
+| `pnpm --filter @fintrack/finance-service db:migrate` | Nieuwe migratie maken na een wijziging in `prisma/schema.prisma` |
+| `pnpm --filter @fintrack/finance-service db:studio` | Prisma Studio: database bekijken in de browser |
 
 ## Status
 
-🚧 In opbouw — `finance-service` (CoinGecko, `/health`, `/metrics`) staat. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
+🚧 In opbouw — `finance-service` (CoinGecko, portfolio, `/health`, `/metrics`) en de database staan. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
 
 ## Workflow
 

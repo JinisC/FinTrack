@@ -10,6 +10,9 @@ build/
 .nest/
 *.tsbuildinfo
 
+# Gegenereerde Prisma-client
+apps/*/src/generated/
+
 # Environment
 .env
 .env.local

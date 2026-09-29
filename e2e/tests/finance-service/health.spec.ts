@@ -6,7 +6,7 @@ test.afterEach(async ({ request }) => {
   await setCoinGeckoMode(request, 'ok');
 });
 
-test('GET /health meldt ok als CoinGecko bereikbaar is', async ({ request }) => {
+test('GET /health meldt ok als database en CoinGecko bereikbaar zijn', async ({ request }) => {
   const response = await request.get('/health');
 
   expect(response.status()).toBe(200);
@@ -14,7 +14,7 @@ test('GET /health meldt ok als CoinGecko bereikbaar is', async ({ request }) => 
   expect(body).toMatchObject({
     status: 'ok',
     service: 'finance-service',
-    dependencies: { coingecko: { status: 'up' } },
+    dependencies: { database: { status: 'up' }, coingecko: { status: 'up' } },
   });
   expect(body.uptimeSeconds).toBeGreaterThanOrEqual(0);
   expect(body.memory.heapUsedMb).toBeGreaterThan(0);

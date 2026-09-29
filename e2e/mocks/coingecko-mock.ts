@@ -12,7 +12,10 @@ type Mode = 'ok' | 'rate-limit' | 'down';
 
 const port = Number(process.env.MOCK_PORT ?? 4010);
 const fixtures = join(import.meta.dirname, '..', 'fixtures');
-const markets: unknown[] = JSON.parse(readFileSync(join(fixtures, 'markets.json'), 'utf8'));
+const markets: { id: string; current_price: number }[] = JSON.parse(
+  readFileSync(join(fixtures, 'markets.json'), 'utf8'),
+);
+const marketsById = new Map(markets.map((m) => [m.id, m]));
 const charts: Record<string, unknown> = {
   bitcoin: JSON.parse(readFileSync(join(fixtures, 'bitcoin-market-chart.json'), 'utf8')),
 };
@@ -51,7 +54,17 @@ const server = createServer((req, res) => {
     const perPage = Number(url.searchParams.get('per_page') ?? 100);
     return json(res, 200, markets.slice(0, perPage));
   }
-  const chartMatch = /^\/coins\/([^/]+)\/market_chart$/.exec(url.pathname);
+  if (url.pathname === '/simple/price') {
+    const ids = (url.searchParams.get('ids') ?? '').split(',');
+    const prices = Object.fromEntries(
+      ids.flatMap((id) => {
+        const market = marketsById.get(id);
+        return market ? [[id, { usd: market.current_price }]] : [];
+      }),
+    );
+    return json(res, 200, prices);
+  }
+  const chartMatch =/^\/coins\/([^/]+)\/market_chart$/.exec(url.pathname);
   if (chartMatch) {
     const chart = charts[decodeURIComponent(chartMatch[1])];
     return chart ? json(res, 200, chart) : json(res, 404, { error: 'coin not found' });

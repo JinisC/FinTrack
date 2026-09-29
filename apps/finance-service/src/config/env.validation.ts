@@ -1,11 +1,23 @@
 import { plainToInstance } from 'class-transformer';
-import { IsInt, IsOptional, IsString, IsUrl, Max, Min, validateSync } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Matches,
+  Max,
+  Min,
+  validateSync,
+} from 'class-validator';
 
 export class EnvironmentVariables {
   @IsInt()
   @Min(1)
   @Max(65535)
   PORT: number = 3000;
+
+  @Matches(/^postgres(ql)?:\/\//, { message: 'DATABASE_URL moet een PostgreSQL-URL zijn' })
+  DATABASE_URL: string;
 
   @IsUrl({ require_tld: false })
   COINGECKO_BASE_URL: string = 'https://api.coingecko.com/api/v3';

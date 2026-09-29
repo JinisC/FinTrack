@@ -10,6 +10,8 @@
     "test": "pnpm -r --filter \"./libs/**\" --filter \"./apps/**\" test",
     "lint": "pnpm -r lint",
     "test:e2e": "pnpm --filter @fintrack/e2e test",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down"
   }
 }

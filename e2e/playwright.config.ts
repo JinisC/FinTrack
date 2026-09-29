@@ -1,5 +1,11 @@
 import { defineConfig } from '@playwright/test';
-import { FINANCE_PORT, MOCK_PORT, coingeckoMockUrl, financeServiceUrl } from './support/env.js';
+import {
+  FINANCE_PORT,
+  MOCK_PORT,
+  coingeckoMockUrl,
+  e2eDatabaseUrl,
+  financeServiceUrl,
+} from './support/env.js';
 
 export default defineConfig({
   testDir: './tests',
@@ -25,12 +31,18 @@ export default defineConfig({
       reuseExistingServer: false,
     },
     {
+      // Vereist een draaiende database (`pnpm db:up`); /health geeft 503 zolang die ontbreekt.
       name: 'finance-service',
-      command:
-        'pnpm --filter @fintrack/shared-types build && pnpm --filter @fintrack/finance-service build && node ../apps/finance-service/dist/main.js',
+      command: [
+        'pnpm --filter @fintrack/shared-types build',
+        'pnpm --filter @fintrack/finance-service build',
+        'pnpm --filter @fintrack/finance-service db:deploy',
+        'node ../apps/finance-service/dist/main.js',
+      ].join(' && '),
       url: `${financeServiceUrl}/health`,
       env: {
         PORT: String(FINANCE_PORT),
+        DATABASE_URL: e2eDatabaseUrl,
         COINGECKO_BASE_URL: coingeckoMockUrl,
         // Korte TTL zodat tests de cache kunnen laten verlopen; health pingt telkens opnieuw.
         CACHE_TTL_SECONDS: '1',
