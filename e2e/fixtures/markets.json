@@ -1,0 +1,122 @@
+[
+  {
+    "id": "bitcoin",
+    "symbol": "btc",
+    "name": "Bitcoin",
+    "image": "https://assets.example.com/bitcoin.png",
+    "current_price": 65000,
+    "market_cap": 65000000000000,
+    "price_change_percentage_24h": -2.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "ethereum",
+    "symbol": "eth",
+    "name": "Ethereum",
+    "image": "https://assets.example.com/ethereum.png",
+    "current_price": 3200,
+    "market_cap": 1600000000000,
+    "price_change_percentage_24h": -1.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "tether",
+    "symbol": "usdt",
+    "name": "Tether",
+    "image": "https://assets.example.com/tether.png",
+    "current_price": 1,
+    "market_cap": 333333333,
+    "price_change_percentage_24h": -0.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "binancecoin",
+    "symbol": "bnb",
+    "name": "BNB",
+    "image": "https://assets.example.com/binancecoin.png",
+    "current_price": 580,
+    "market_cap": 145000000000,
+    "price_change_percentage_24h": 0.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "solana",
+    "symbol": "sol",
+    "name": "Solana",
+    "image": "https://assets.example.com/solana.png",
+    "current_price": 150,
+    "market_cap": 30000000000,
+    "price_change_percentage_24h": 1.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "usd-coin",
+    "symbol": "usdc",
+    "name": "USDC",
+    "image": "https://assets.example.com/usd-coin.png",
+    "current_price": 1,
+    "market_cap": 166666667,
+    "price_change_percentage_24h": -2.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "ripple",
+    "symbol": "xrp",
+    "name": "XRP",
+    "image": "https://assets.example.com/ripple.png",
+    "current_price": 0.55,
+    "market_cap": 78571429,
+    "price_change_percentage_24h": -1.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "dogecoin",
+    "symbol": "doge",
+    "name": "Dogecoin",
+    "image": "https://assets.example.com/dogecoin.png",
+    "current_price": 0.12,
+    "market_cap": 15000000,
+    "price_change_percentage_24h": -0.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "cardano",
+    "symbol": "ada",
+    "name": "Cardano",
+    "image": "https://assets.example.com/cardano.png",
+    "current_price": 0.45,
+    "market_cap": 50000000,
+    "price_change_percentage_24h": 0.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "tron",
+    "symbol": "trx",
+    "name": "TRON",
+    "image": "https://assets.example.com/tron.png",
+    "current_price": 0.16,
+    "market_cap": 16000000,
+    "price_change_percentage_24h": 1.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "avalanche-2",
+    "symbol": "avax",
+    "name": "Avalanche",
+    "image": "https://assets.example.com/avalanche-2.png",
+    "current_price": 28,
+    "market_cap": 2545454545,
+    "price_change_percentage_24h": -2.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  },
+  {
+    "id": "chainlink",
+    "symbol": "link",
+    "name": "Chainlink",
+    "image": "https://assets.example.com/chainlink.png",
+    "current_price": 14,
+    "market_cap": 1166666667,
+    "price_change_percentage_24h": -1.5,
+    "last_updated": "2026-09-29T10:00:00.000Z"
+  }
+]
