@@ -6,7 +6,7 @@ import {
   collectDefaultMetrics,
 } from '@prometheus-io/client';
 
-export type PriceCacheKind = 'markets' | 'history';
+export type PriceCacheKind = 'markets' | 'history' | 'current';
 
 @Injectable()
 export class MetricsService {

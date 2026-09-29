@@ -19,7 +19,7 @@ const bitcoin: CoinGeckoMarket = {
 };
 
 describe('PricesService', () => {
-  let coingecko: { getMarkets: ReturnType<typeof vi.fn>; getMarketChart: ReturnType<typeof vi.fn> };
+  let coingecko: Record<'getMarkets' | 'getMarketChart' | 'getSimplePrices', ReturnType<typeof vi.fn>>;
   let cache: Cache;
   let metrics: MetricsService;
   let service: PricesService;
@@ -28,7 +28,7 @@ describe('PricesService', () => {
     (await c.get()).values.find((v) => v.labels.kind === kind)?.value ?? 0;
 
   beforeEach(() => {
-    coingecko = { getMarkets: vi.fn(), getMarketChart: vi.fn() };
+    coingecko = { getMarkets: vi.fn(), getMarketChart: vi.fn(), getSimplePrices: vi.fn() };
     cache = createCache() as Cache;
     metrics = new MetricsService();
     service = new PricesService(
@@ -111,6 +111,32 @@ describe('PricesService', () => {
         { timestamp: 1000, price: 1.5 },
         { timestamp: 2000, price: 1.6 },
       ],
+    });
+  });
+  describe('getCurrentPrices', () => {
+    it('geeft USD-prijzen per id en laat onbekende coins weg', async () => {
+      coingecko.getSimplePrices.mockResolvedValue({ bitcoin: { usd: 65000 }, raar: {} });
+
+      const result = await service.getCurrentPrices(['bitcoin', 'raar']);
+
+      expect(result.data).toEqual({ bitcoin: 65000 });
+    });
+
+    it('ontdubbelt en sorteert ids zodat dezelfde set dezelfde cache-key krijgt', async () => {
+      coingecko.getSimplePrices.mockResolvedValue({ bitcoin: { usd: 1 }, ethereum: { usd: 2 } });
+
+      await service.getCurrentPrices(['ethereum', 'bitcoin', 'bitcoin']);
+      await service.getCurrentPrices(['bitcoin', 'ethereum']);
+
+      expect(coingecko.getSimplePrices).toHaveBeenCalledTimes(1);
+      expect(coingecko.getSimplePrices).toHaveBeenCalledWith(['bitcoin', 'ethereum']);
+    });
+
+    it('doet geen request voor een lege lijst', async () => {
+      const result = await service.getCurrentPrices([]);
+
+      expect(result.data).toEqual({});
+      expect(coingecko.getSimplePrices).not.toHaveBeenCalled();
     });
   });
 });

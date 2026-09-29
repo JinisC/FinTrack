@@ -35,7 +35,7 @@ Twee backend-services, gescheiden van verantwoordelijkheid, binnen deze monorepo
 - **`finance-service`** — haalt cryptodata op (CoinGecko API), beheert portfolio en alerts, exposeert `/health` en `/metrics` in Prometheus-formaat.
 - **`monitoring-service`** — polled periodiek de endpoints van `finance-service` (en de externe CoinGecko-API), slaat historiek op, berekent uptime/response-times, triggert alerts.
 
-Beide services delen dezelfde PostgreSQL-database (aparte schema's/tabellen) om binnen de gratis-tier-limieten van hosting providers te blijven.
+Beide services delen dezelfde PostgreSQL-database (aparte schema's/tabellen) om binnen de gratis-tier-limieten van hosting providers te blijven. Elke service beheert enkel zijn eigen schema en migraties (Prisma): `finance` (users, portfolio) door `finance-service`, `monitoring` (metrics-historiek) door `monitoring-service`.
 
 Communicatie tussen frontend en backend via REST + WebSockets (live updates voor prijzen en alerts, zonder polling vanuit de client).
 
@@ -98,10 +98,10 @@ fintrack/
 
 ## 8. Ontwikkelvolgorde (aanbevolen)
 
-1. Repo-structuur + docker-compose skeleton opzetten
-2. `finance-service`: CoinGecko-integratie, `/health` en `/metrics` endpoints
-3. Database-schema (portfolio, users, metrics-historiek)
-4. `monitoring-service`: polling van finance-service + opslag van metrics
+1. ✅ Repo-structuur + docker-compose skeleton opzetten
+2. ✅ `finance-service`: CoinGecko-integratie, `/health` en `/metrics` endpoints
+3. ✅ Database-schema (portfolio, users) met Prisma + portfolio-API — schema `finance`
+4. `monitoring-service`: polling van finance-service + opslag van metrics (metrics-historiek in eigen schema `monitoring`)
 5. Angular-frontend: basis routing, auth, finance-dashboard UI
 6. WebSocket-integratie voor live updates
 7. Monitoring-dashboard UI

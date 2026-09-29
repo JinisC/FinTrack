@@ -50,6 +50,22 @@ export class PricesService {
     });
   }
 
+  /** Actuele USD-prijs per coin-id. Onbekende ids ontbreken in het resultaat. */
+  async getCurrentPrices(ids: readonly string[]): Promise<PriceResponse<Record<string, number>>> {
+    const uniqueIds = [...new Set(ids)].sort();
+    if (uniqueIds.length === 0) {
+      return { data: {}, stale: false, fetchedAt: new Date().toISOString() };
+    }
+    return this.cached('current', `current:${uniqueIds.join(',')}`, async () => {
+      const prices = await this.coingecko.getSimplePrices(uniqueIds);
+      return Object.fromEntries(
+        Object.entries(prices).flatMap(([id, price]) =>
+          price.usd === undefined ? [] : [[id, price.usd] as const],
+        ),
+      );
+    });
+  }
+
   private async cached<T>(
     kind: PriceCacheKind,
     key: string,

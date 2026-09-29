@@ -7,6 +7,7 @@ import {
   CoinGeckoError,
   type CoinGeckoMarket,
   type CoinGeckoMarketChart,
+  type CoinGeckoSimplePrices,
 } from './coingecko.types.js';
 
 const VS_CURRENCY = 'usd';
@@ -31,6 +32,13 @@ export class CoinGeckoClient {
     return this.request('market_chart', `/coins/${encodeURIComponent(id)}/market_chart`, {
       vs_currency: VS_CURRENCY,
       days,
+    });
+  }
+
+  getSimplePrices(ids: readonly string[]): Promise<CoinGeckoSimplePrices> {
+    return this.request('simple_price', '/simple/price', {
+      ids: ids.join(','),
+      vs_currencies: VS_CURRENCY,
     });
   }
 

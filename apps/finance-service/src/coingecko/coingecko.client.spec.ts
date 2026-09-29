@@ -57,6 +57,17 @@ describe('CoinGeckoClient', () => {
     });
   });
 
+  it('vraagt actuele prijzen voor meerdere coins in één request op', async () => {
+    http.get.mockReturnValue(of(axiosResponse({ bitcoin: { usd: 65000 } })));
+
+    const result = await client.getSimplePrices(['bitcoin', 'ethereum']);
+
+    expect(result).toEqual({ bitcoin: { usd: 65000 } });
+    expect(http.get).toHaveBeenCalledWith('/simple/price', {
+      params: { ids: 'bitcoin,ethereum', vs_currencies: 'usd' },
+    });
+  });
+
   it('gooit een CoinGeckoError met de HTTP-status bij een foutantwoord', async () => {
     http.get.mockReturnValue(throwError(() => axiosError(429)));
 

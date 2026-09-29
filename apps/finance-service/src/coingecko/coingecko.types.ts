@@ -15,6 +15,9 @@ export interface CoinGeckoMarketChart {
   prices: [number, number][];
 }
 
+/** Antwoord van /simple/price: onbekende ids ontbreken gewoon in het object. */
+export type CoinGeckoSimplePrices = Record<string, { usd?: number }>;
+
 export class CoinGeckoError extends Error {
   constructor(
     readonly endpoint: string,

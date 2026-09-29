@@ -9,5 +9,6 @@ import { PricesService } from './prices.service.js';
   imports: [CoinGeckoModule, CacheModule.register()],
   controllers: [PricesController],
   providers: [PricesService],
+  exports: [PricesService],
 })
 export class PricesModule {}

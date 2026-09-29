@@ -9,11 +9,13 @@ export interface DependencyCheck {
 }
 
 /**
- * Antwoord van `GET /health`. `degraded` betekent dat de service zelf draait, maar een
- * externe afhankelijkheid faalt — de service blijft dan (met cache/stale data) bruikbaar.
+ * Antwoord van `GET /health`.
+ * - `degraded`: een externe afhankelijkheid (CoinGecko) faalt; de service blijft met cache/stale
+ *   data bruikbaar (HTTP 200).
+ * - `down`: een kritieke afhankelijkheid (database) faalt (HTTP 503).
  */
 export interface HealthReport {
-  status: 'ok' | 'degraded';
+  status: 'ok' | 'degraded' | 'down';
   service: string;
   timestamp: string;
   uptimeSeconds: number;
