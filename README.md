@@ -18,7 +18,8 @@ fintrack/
 │   ├── finance-service/       # NestJS
 │   └── monitoring-service/    # NestJS
 ├── libs/
-│   └── shared-types/          # Gedeelde TS-interfaces tussen frontend/backend
+│   ├── shared-types/          # Gedeelde TS-interfaces tussen frontend/backend
+│   └── nest-observability/    # Gedeelde /metrics + HTTP-metrics voor alle NestJS-services
 ├── e2e/                       # Playwright-tests (nu API, later ook frontend)
 ├── docker-compose.yml
 ├── .github/
@@ -30,20 +31,24 @@ fintrack/
 
 ## Lokaal draaien
 
-Vereisten: **Node 22+** (zie `.nvmrc`), **pnpm 10** en **Docker Desktop** (voor Postgres).
+Vereisten: **Node 22+** (zie `.nvmrc`), **pnpm 10** en **Docker Desktop** (voor Postgres en Mailpit).
 
 ```bash
 pnpm install
 cp apps/finance-service/.env.example apps/finance-service/.env
+cp apps/monitoring-service/.env.example apps/monitoring-service/.env
 
-pnpm db:up                                           # Postgres 17 in Docker
-pnpm --filter @fintrack/finance-service db:deploy    # migraties toepassen
-pnpm --filter @fintrack/finance-service db:seed      # demo-gebruiker + voorbeeld-portfolio (optioneel)
+pnpm db:up                                              # Postgres 17 + Mailpit in Docker
+pnpm --filter @fintrack/finance-service db:deploy       # migraties toepassen (schema finance)
+pnpm --filter @fintrack/monitoring-service db:deploy    # migraties toepassen (schema monitoring)
+pnpm --filter @fintrack/finance-service db:seed         # demo-gebruiker + voorbeeld-portfolio (optioneel)
 
-pnpm --filter @fintrack/finance-service start:dev    # http://localhost:3000
+pnpm dev    # finance-service op :3000 en monitoring-service op :3001, in watch-modus
 ```
 
-Configuratie via omgevingsvariabelen of een `.env` in `apps/finance-service/` — zie [`.env.example`](apps/finance-service/.env.example). Een gratis CoinGecko Demo-key (`COINGECKO_API_KEY`) is optioneel maar voorkomt snel rate-limiting.
+Configuratie via omgevingsvariabelen of een `.env` per service — zie de `.env.example` in [`apps/finance-service`](apps/finance-service/.env.example) en [`apps/monitoring-service`](apps/monitoring-service/.env.example). Een gratis CoinGecko Demo-key (`COINGECKO_API_KEY`) is optioneel maar voorkomt snel rate-limiting.
+
+**Mailpit** vangt alle alert-mails lokaal op — bekijk ze op http://localhost:8025. Er wordt niets echt verstuurd.
 
 ### finance-service endpoints
 
@@ -62,21 +67,37 @@ Configuratie via omgevingsvariabelen of een `.env` in `apps/finance-service/` �
 - Zolang er geen authenticatie is, horen alle portfolio-requests bij een vaste demo-gebruiker.
 - `/health` geeft `503` als de database onbereikbaar is; een CoinGecko-storing geeft `degraded` met `200`.
 
+### monitoring-service endpoints
+
+Pollt `finance-service /health` (elke 30s) en `CoinGecko /ping` (elke 60s), bewaart elke check en opent een **incident** na 2 opeenvolgende mislukte checks — met een alert-mail bij start en herstel. `degraded` telt als beschikbaar en opent geen incident.
+
+| Endpoint | Beschrijving |
+|---|---|
+| `GET /api/status` | Huidige status per target + eventueel open incident |
+| `GET /api/uptime?window=24h` | Uptime-% en gemiddelde/p95-responstijd per target (`24h`, `7d`, `30d`) |
+| `GET /api/checks?target=finance-service&window=24h` | Tijdreeks in buckets (5 min / 1 u / 6 u) voor grafieken |
+| `GET /api/incidents?limit=20` | Recente incidenten met duur |
+| `GET /health` | Status van database + poller |
+| `GET /metrics` | Prometheus-metrics (o.a. `monitored_target_status`, responstijden, verstuurde alerts) |
+
+Checks ouder dan 30 dagen worden dagelijks opgeruimd; incidenten blijven bewaard.
+
 ### Scripts
 
 | Commando | Doel |
 |---|---|
-| `pnpm db:up` / `pnpm db:down` | Postgres-container starten / stoppen |
+| `pnpm db:up` / `pnpm db:down` | Postgres- en Mailpit-containers starten / stoppen |
+| `pnpm dev` | Beide services in watch-modus |
 | `pnpm build` | Build van libs en apps |
 | `pnpm test` | Unit tests (Vitest) |
-| `pnpm test:e2e` | API-tests (Playwright) tegen een CoinGecko-mock en de database `fintrack_e2e` (vereist `pnpm db:up`) |
+| `pnpm test:e2e` | API-tests (Playwright) tegen mocks, de database `fintrack_e2e` en Mailpit (vereist `pnpm db:up`) |
 | `pnpm lint` / `pnpm typecheck` | Oxlint / TypeScript-controle |
-| `pnpm --filter @fintrack/finance-service db:migrate` | Nieuwe migratie maken na een wijziging in `prisma/schema.prisma` |
-| `pnpm --filter @fintrack/finance-service db:studio` | Prisma Studio: database bekijken in de browser |
+| `pnpm --filter @fintrack/<service> db:migrate` | Nieuwe migratie maken na een wijziging in `prisma/schema.prisma` |
+| `pnpm --filter @fintrack/<service> db:studio` | Prisma Studio: database bekijken in de browser |
 
 ## Status
 
-🚧 In opbouw — `finance-service` (CoinGecko, portfolio, `/health`, `/metrics`) en de database staan. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
+🚧 In opbouw — `finance-service` (CoinGecko, portfolio) en `monitoring-service` (polling, incidenten, alerts, dashboard-API) staan. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
 
 ## Workflow
 

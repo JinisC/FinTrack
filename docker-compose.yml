@@ -18,5 +18,16 @@ services:
       timeout: 3s
       retries: 10
 
+  # Vangt alle uitgaande mail op (alerts van monitoring-service); web-UI op http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.31.3
+    container_name: fintrack-mailpit
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
 volumes:
   pgdata:

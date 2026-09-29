@@ -1,0 +1,52 @@
+// Datamodel van de monitoring-service. De verbindings-URL staat in prisma.config.ts (DATABASE_URL).
+// Die URL eindigt op ?schema=monitoring, zodat ook de migratiehistoriek (_prisma_migrations)
+// in dit schema staat en niet botst met die van finance-service.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["monitoring"]
+}
+
+enum CheckStatus {
+  up
+  degraded
+  down
+
+  @@schema("monitoring")
+}
+
+/// Resultaat van één poll van een bewaakt target.
+model HealthCheck {
+  id             BigInt      @id @default(autoincrement())
+  /// "finance-service" of "coingecko".
+  target         String
+  checkedAt      DateTime    @default(now()) @map("checked_at")
+  status         CheckStatus
+  responseTimeMs Int?        @map("response_time_ms")
+  httpStatus     Int?        @map("http_status")
+  error          String?
+
+  @@index([target, checkedAt])
+  @@map("health_checks")
+  @@schema("monitoring")
+}
+
+/// Periode waarin een target down was. Open zolang resolvedAt null is.
+model Incident {
+  id                  String    @id @default(uuid()) @db.Uuid
+  target              String
+  startedAt           DateTime  @map("started_at")
+  resolvedAt          DateTime? @map("resolved_at")
+  cause               String
+  alertSentAt         DateTime? @map("alert_sent_at")
+  resolvedAlertSentAt DateTime? @map("resolved_alert_sent_at")
+
+  @@index([target, startedAt])
+  @@map("incidents")
+  @@schema("monitoring")
+}

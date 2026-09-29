@@ -2,8 +2,8 @@ export type DependencyStatus = 'up' | 'down';
 
 export interface DependencyCheck {
   status: DependencyStatus;
-  /** Responstijd van de laatste check in milliseconden. */
-  responseTimeMs: number;
+  /** Responstijd van de laatste check in milliseconden (niet voor interne checks). */
+  responseTimeMs?: number;
   checkedAt: string;
   error?: string;
 }

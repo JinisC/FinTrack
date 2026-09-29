@@ -11,6 +11,7 @@
     "lint": "pnpm -r lint",
     "test:e2e": "pnpm --filter @fintrack/e2e test",
     "typecheck": "pnpm -r typecheck",
+    "dev": "pnpm -r --parallel --filter \"./apps/**\" start:dev",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down"
   }
