@@ -25,6 +25,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@fintrack/nest-observability": "workspace:*",
     "@fintrack/shared-types": "workspace:*",
     "@nestjs/axios": "^12.0.1",
     "@nestjs/cache-manager": "^12.0.0",

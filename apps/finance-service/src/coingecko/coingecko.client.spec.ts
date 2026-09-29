@@ -1,6 +1,7 @@
 import type { HttpService } from '@nestjs/axios';
 import { AxiosError, AxiosHeaders, type AxiosResponse } from 'axios';
 import { of, throwError } from 'rxjs';
+import { MetricsRegistry } from '@fintrack/nest-observability';
 import { MetricsService } from '../metrics/metrics.service.js';
 import { CoinGeckoClient } from './coingecko.client.js';
 import { CoinGeckoError } from './coingecko.types.js';
@@ -31,7 +32,7 @@ describe('CoinGeckoClient', () => {
 
   beforeEach(() => {
     http = { get: vi.fn() };
-    metrics = new MetricsService();
+    metrics = new MetricsService(new MetricsRegistry());
     client = new CoinGeckoClient(http as unknown as HttpService, metrics);
   });
 

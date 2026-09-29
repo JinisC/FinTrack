@@ -101,7 +101,7 @@ fintrack/
 1. ✅ Repo-structuur + docker-compose skeleton opzetten
 2. ✅ `finance-service`: CoinGecko-integratie, `/health` en `/metrics` endpoints
 3. ✅ Database-schema (portfolio, users) met Prisma + portfolio-API — schema `finance`
-4. `monitoring-service`: polling van finance-service + opslag van metrics (metrics-historiek in eigen schema `monitoring`)
+4. ✅ `monitoring-service`: polling van finance-service + CoinGecko, opslag in schema `monitoring`, incidenten met e-mailalerts (Mailpit lokaal), API voor het dashboard
 5. Angular-frontend: basis routing, auth, finance-dashboard UI
 6. WebSocket-integratie voor live updates
 7. Monitoring-dashboard UI
