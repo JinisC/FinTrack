@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Een nieuwe push op dezelfde PR/branch annuleert de vorige, nog lopende run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # `prisma generate` (postinstall/prebuild) vereist een DATABASE_URL, ook zonder database.
+  # Wijst naar de e2e-database; Playwright zet per service zijn eigen DATABASE_URL.
+  DATABASE_URL: postgresql://fintrack:fintrack@localhost:5432/fintrack_e2e
+
+jobs:
+  checks:
+    name: Lint, typecheck, unittests & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      # Gebruikt de pnpm-versie uit `packageManager` in package.json.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Bouwt via `prepare` ook de libs en genereert via `postinstall` de Prisma-clients.
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      # Zelfde images als docker-compose.yml. init.sql kan hier niet gemount worden,
+      # dus Postgres maakt de e2e-database meteen zelf aan.
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: fintrack
+          POSTGRES_PASSWORD: fintrack
+          POSTGRES_DB: fintrack_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fintrack -d fintrack_e2e"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      mailpit:
+        image: axllent/mailpit:v1.31.3
+        env:
+          MP_SMTP_AUTH_ACCEPT_ANY: 1
+          MP_SMTP_AUTH_ALLOW_INSECURE: 1
+        ports:
+          - 1025:1025
+          - 8025:8025
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Enkel API-tests: geen browsers nodig. Playwright start zelf de mocks en services.
+      - run: pnpm test:e2e
+
+      - name: Playwright-rapport uploaden
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7

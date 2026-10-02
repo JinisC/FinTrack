@@ -97,9 +97,20 @@ Checks ouder dan 30 dagen worden dagelijks opgeruimd; incidenten blijven bewaard
 
 ## Status
 
-🚧 In opbouw — `finance-service` (CoinGecko, portfolio) en `monitoring-service` (polling, incidenten, alerts, dashboard-API) staan. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
+🚧 In opbouw — `finance-service` (CoinGecko, portfolio) en `monitoring-service` (polling, incidenten, alerts, dashboard-API) staan, met CI via GitHub Actions. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
 
 ## Workflow
 
 - Feature branches per taak/issue, PR's naar `main` — geen directe commits op `main`.
 - Issues volgen de templates in `.github/ISSUE_TEMPLATE/`.
+
+### CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) draait bij elke PR naar `main` en na elke merge, met twee parallelle jobs:
+
+| Job | Wat | Lokaal hetzelfde |
+|---|---|---|
+| `checks` | Lint, typecheck, unittests en build | `pnpm lint && pnpm typecheck && pnpm test && pnpm build` |
+| `e2e` | Playwright-API-tests met Postgres en Mailpit als service-containers | `pnpm db:up && pnpm test:e2e` |
+
+Faalt `e2e`, dan staat het Playwright-rapport 7 dagen als artifact (`playwright-report`) bij de run op GitHub.

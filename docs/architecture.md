@@ -105,6 +105,6 @@ fintrack/
 5. Angular-frontend: basis routing, auth, finance-dashboard UI
 6. WebSocket-integratie voor live updates
 7. Monitoring-dashboard UI
-8. CI/CD-pipeline + deployment naar Render/Vercel
+8. CI/CD-pipeline + deployment naar Render/Vercel — ✅ CI (GitHub Actions: lint, typecheck, unit, build, e2e); CD + deployment nog open
 9. Tests toevoegen (unit + e2e)
 10. Polish: alerts, stretch-features, README met screenshots
