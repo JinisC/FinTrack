@@ -1,0 +1,81 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Aankoop wijzigen' : 'Aankoop toevoegen' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()" id="entry-form">
+  <mat-dialog-content class="fields">
+    @if (coinOptions; as options) {
+      <mat-form-field>
+        <mat-label>Coin</mat-label>
+        <mat-select formControlName="coinId">
+          @for (option of options; track option.id) {
+            <mat-option [value]="option.id">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+        @if (currentPrice(form.controls.coinId.value); as price) {
+          <mat-hint>Actuele prijs: {{ price | usd }}</mat-hint>
+        }
+        @if (form.controls.coinId.hasError('required')) {
+          <mat-error>Kies een coin.</mat-error>
+        }
+      </mat-form-field>
+    } @else {
+      <!-- Zonder prijslijst (CoinGecko onbereikbaar) kan je de CoinGecko-id zelf intypen. -->
+      <mat-form-field>
+        <mat-label>CoinGecko-id</mat-label>
+        <input matInput formControlName="coinId" placeholder="bv. bitcoin" />
+        @if (form.controls.coinId.hasError('required')) {
+          <mat-error>Vul een CoinGecko-id in.</mat-error>
+        } @else if (form.controls.coinId.hasError('pattern')) {
+          <mat-error>Enkel kleine letters, cijfers en koppeltekens.</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <div class="row">
+      <mat-form-field>
+        <mat-label>Aantal</mat-label>
+        <input matInput type="number" formControlName="amount" min="0" step="any" />
+        @if (form.controls.amount.hasError('required')) {
+          <mat-error>Vul een aantal in.</mat-error>
+        } @else if (form.controls.amount.hasError('positive')) {
+          <mat-error>Moet groter zijn dan 0.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Aankoopprijs per coin (USD)</mat-label>
+        <input matInput type="number" formControlName="buyPriceUsd" min="0" step="any" />
+        @if (form.controls.buyPriceUsd.hasError('required')) {
+          <mat-error>Vul een prijs in.</mat-error>
+        } @else if (form.controls.buyPriceUsd.hasError('min')) {
+          <mat-error>Mag niet negatief zijn.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field>
+      <mat-label>Aankoopdatum</mat-label>
+      <input matInput type="date" formControlName="boughtAt" [max]="maxDate" />
+      @if (form.controls.boughtAt.hasError('required')) {
+        <mat-error>Kies een datum.</mat-error>
+      } @else if (form.controls.boughtAt.hasError('future')) {
+        <mat-error>Mag niet in de toekomst liggen.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Notitie (optioneel)</mat-label>
+      <textarea matInput formControlName="note" rows="2" maxlength="500"></textarea>
+    </mat-form-field>
+
+    @if (serverError(); as error) {
+      <p class="server-error" role="alert">{{ error }}</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Annuleren</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">
+      {{ saving() ? 'Opslaan…' : 'Opslaan' }}
+    </button>
+  </mat-dialog-actions>
+</form>

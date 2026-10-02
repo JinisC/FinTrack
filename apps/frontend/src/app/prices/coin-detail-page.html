@@ -1,0 +1,55 @@
+<a mat-button routerLink="/prices" class="back">
+  <mat-icon>arrow_back</mat-icon>
+  Terug naar de markt
+</a>
+
+<header class="page-header">
+  <div class="title">
+    @if (coin(); as c) {
+      <img [src]="c.image" alt="" width="40" height="40" />
+      <div>
+        <h1>{{ c.name }} <span class="symbol">{{ c.symbol }}</span></h1>
+        <div class="price">
+          {{ c.currentPrice | usd }}
+          @if (changePct() !== null) {
+            <span [class]="changePct() | trendClass">
+              {{ changePct() | changePct }} ({{ days() === 1 ? '24u' : days() + ' dagen' }})
+            </span>
+          }
+        </div>
+      </div>
+    } @else {
+      <h1>{{ id() }}</h1>
+    }
+  </div>
+
+  <mat-button-toggle-group
+    [value]="days()"
+    (change)="days.set($event.value)"
+    hideSingleSelectionIndicator
+    aria-label="Periode"
+  >
+    @for (option of dayOptions; track option.days) {
+      <mat-button-toggle [value]="option.days">{{ option.label }}</mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+</header>
+
+@if (errorMessage(); as message) {
+  <app-error-notice [message]="message" (retry)="history.reload()" />
+}
+
+@if (history.hasValue() && history.value().stale) {
+  <app-stale-notice [fetchedAt]="history.value().fetchedAt" />
+}
+
+<mat-card appearance="outlined" class="chart-card">
+  @if (history.isLoading()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  @if (points().length > 0) {
+    <div echarts class="chart" [options]="chartOptions()" aria-label="Prijsgrafiek"></div>
+  } @else if (history.hasValue()) {
+    <p class="empty">Geen prijsdata voor deze periode.</p>
+  }
+</mat-card>

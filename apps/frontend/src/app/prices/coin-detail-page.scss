@@ -1,0 +1,42 @@
+.back {
+  margin: 0 0 12px -12px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  img {
+    border-radius: 50%;
+  }
+}
+
+.symbol {
+  color: var(--mat-sys-on-surface-variant);
+  text-transform: uppercase;
+  font: var(--mat-sys-title-medium);
+}
+
+.price {
+  font: var(--mat-sys-title-medium);
+  font-variant-numeric: tabular-nums;
+
+  span {
+    margin-left: 8px;
+  }
+}
+
+.chart-card {
+  min-height: 420px;
+}
+
+.chart {
+  height: 420px;
+  width: 100%;
+}
+
+.empty {
+  padding: 24px;
+  color: var(--mat-sys-on-surface-variant);
+}

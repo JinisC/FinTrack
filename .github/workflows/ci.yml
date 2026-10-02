@@ -83,8 +83,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Enkel API-tests: geen browsers nodig. Playwright start zelf de mocks en services.
+      # Chromium voor de frontend-browsertests (de API-tests hebben geen browser nodig).
+      - run: pnpm --filter @fintrack/e2e exec playwright install --with-deps chromium
+
+      # Playwright start zelf de mocks, beide services en de Angular-dev-server.
       - run: pnpm test:e2e
+        env:
+          NG_CLI_ANALYTICS: 'false'
 
       - name: Playwright-rapport uploaden
         if: failure()
