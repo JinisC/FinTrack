@@ -5,7 +5,8 @@ export function apiErrorMessage(error: unknown): string {
   if (!(error instanceof HttpErrorResponse)) {
     return 'Er ging iets mis.';
   }
-  if (error.status === 0) {
+  // 0 = netwerkfout; 502/504 = de dev-server-proxy bereikt de finance-service niet.
+  if (error.status === 0 || error.status === 502 || error.status === 504) {
     return 'De finance-service is niet bereikbaar.';
   }
   if (error.status === 503) {

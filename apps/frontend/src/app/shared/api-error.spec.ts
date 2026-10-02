@@ -9,6 +9,11 @@ describe('apiErrorMessage', () => {
     expect(apiErrorMessage(httpError(0))).toBe('De finance-service is niet bereikbaar.');
   });
 
+  it('meldt dat de service onbereikbaar is als de proxy hem niet bereikt', () => {
+    expect(apiErrorMessage(httpError(502))).toBe('De finance-service is niet bereikbaar.');
+    expect(apiErrorMessage(httpError(504))).toBe('De finance-service is niet bereikbaar.');
+  });
+
   it('legt een 503 uit als CoinGecko-storing', () => {
     expect(apiErrorMessage(httpError(503))).toContain('CoinGecko');
   });
