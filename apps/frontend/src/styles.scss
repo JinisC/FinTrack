@@ -1,0 +1,58 @@
+@use '@angular/material' as mat;
+
+// Material 3-thema; `color-scheme: light dark` volgt automatisch de systeeminstelling.
+html {
+  color-scheme: light dark;
+
+  @include mat.theme(
+    (
+      color: mat.$azure-palette,
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Kleuren voor winst/verlies, leesbaar in light en dark mode.
+  --ft-positive: light-dark(#1b7f3b, #6fdc8c);
+  --ft-negative: light-dark(#b3261e, #ffb4ab);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+}
+
+.positive {
+  color: var(--ft-positive);
+}
+
+.negative {
+  color: var(--ft-negative);
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+// Brede tabellen scrollen horizontaal binnen hun kaart, niet de hele pagina.
+.table-scroll {
+  overflow-x: auto;
+}

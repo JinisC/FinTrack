@@ -1,0 +1,32 @@
+.subtitle {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+table {
+  width: 100%;
+}
+
+.coin {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover .name {
+    text-decoration: underline;
+  }
+}
+
+.name {
+  font-weight: 500;
+}
+
+.symbol {
+  color: var(--mat-sys-on-surface-variant);
+  text-transform: uppercase;
+}
+
+img {
+  border-radius: 50%;
+}

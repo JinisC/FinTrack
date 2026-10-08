@@ -1,6 +1,7 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 import {
   FINANCE_PORT,
+  FRONTEND_PORT,
   HEALTH_TARGET_MOCK_PORT,
   MOCK_PORT,
   MONITORING_PORT,
@@ -8,6 +9,7 @@ import {
   e2eAlertAddress,
   e2eDatabaseUrl,
   financeServiceUrl,
+  frontendUrl,
   healthTargetMockUrl,
   monitoringServiceUrl,
 } from './support/env.js';
@@ -31,6 +33,12 @@ export default defineConfig({
       name: 'monitoring-api',
       testDir: './tests/monitoring-service',
       use: { baseURL: monitoringServiceUrl },
+    },
+    {
+      // Browsertests van de Angular-app (vereist `playwright install chromium`).
+      name: 'frontend',
+      testDir: './tests/frontend',
+      use: { ...devices['Desktop Chrome'], baseURL: frontendUrl },
     },
   ],
   // Vereist Postgres en Mailpit uit docker-compose (`pnpm db:up`).
@@ -94,6 +102,15 @@ export default defineConfig({
         ALERT_EMAIL_TO: e2eAlertAddress,
       },
       timeout: 120_000,
+      reuseExistingServer: false,
+    },
+    {
+      // Angular-dev-server; de proxy stuurt `/api` naar de e2e-finance-service.
+      name: 'frontend',
+      command: `pnpm --filter @fintrack/frontend exec ng serve --port ${FRONTEND_PORT}`,
+      url: frontendUrl,
+      env: { FINANCE_SERVICE_URL: financeServiceUrl, NG_CLI_ANALYTICS: 'false' },
+      timeout: 180_000,
       reuseExistingServer: false,
     },
   ],

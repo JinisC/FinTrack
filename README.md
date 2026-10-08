@@ -14,7 +14,7 @@ Volledige projectcontext, architectuur en tech-stackkeuzes: zie [`docs/architect
 ```
 fintrack/
 ├── apps/
-│   ├── frontend/              # Angular app
+│   ├── frontend/              # Angular 22 + Angular Material + ECharts
 │   ├── finance-service/       # NestJS
 │   └── monitoring-service/    # NestJS
 ├── libs/
@@ -43,8 +43,10 @@ pnpm --filter @fintrack/finance-service db:deploy       # migraties toepassen (s
 pnpm --filter @fintrack/monitoring-service db:deploy    # migraties toepassen (schema monitoring)
 pnpm --filter @fintrack/finance-service db:seed         # demo-gebruiker + voorbeeld-portfolio (optioneel)
 
-pnpm dev    # finance-service op :3000 en monitoring-service op :3001, in watch-modus
+pnpm dev    # frontend op :4200, finance-service op :3000 en monitoring-service op :3001, in watch-modus
 ```
+
+Open daarna http://localhost:4200. De Angular-dev-server stuurt `/api` door naar de finance-service (zie [`apps/frontend/proxy.conf.mjs`](apps/frontend/proxy.conf.mjs)), dus CORS is niet nodig.
 
 Configuratie via omgevingsvariabelen of een `.env` per service — zie de `.env.example` in [`apps/finance-service`](apps/finance-service/.env.example) en [`apps/monitoring-service`](apps/monitoring-service/.env.example). Een gratis CoinGecko Demo-key (`COINGECKO_API_KEY`) is optioneel maar voorkomt snel rate-limiting.
 
@@ -87,17 +89,18 @@ Checks ouder dan 30 dagen worden dagelijks opgeruimd; incidenten blijven bewaard
 | Commando | Doel |
 |---|---|
 | `pnpm db:up` / `pnpm db:down` | Postgres- en Mailpit-containers starten / stoppen |
-| `pnpm dev` | Beide services in watch-modus |
+| `pnpm dev` | Frontend en beide services in watch-modus |
 | `pnpm build` | Build van libs en apps |
-| `pnpm test` | Unit tests (Vitest) |
-| `pnpm test:e2e` | API-tests (Playwright) tegen mocks, de database `fintrack_e2e` en Mailpit (vereist `pnpm db:up`) |
+| `pnpm test` | Unit tests (Vitest) van services en frontend |
+| `pnpm test:e2e` | API- en browsertests (Playwright) tegen mocks, de database `fintrack_e2e` en Mailpit (vereist `pnpm db:up`) |
+| `pnpm --filter @fintrack/e2e browsers` | Chromium voor de browsertests installeren (eenmalig) |
 | `pnpm lint` / `pnpm typecheck` | Oxlint / TypeScript-controle |
 | `pnpm --filter @fintrack/<service> db:migrate` | Nieuwe migratie maken na een wijziging in `prisma/schema.prisma` |
 | `pnpm --filter @fintrack/<service> db:studio` | Prisma Studio: database bekijken in de browser |
 
 ## Status
 
-🚧 In opbouw — `finance-service` (CoinGecko, portfolio) en `monitoring-service` (polling, incidenten, alerts, dashboard-API) staan, met CI via GitHub Actions. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
+🚧 In opbouw — `finance-service` (CoinGecko, portfolio), `monitoring-service` (polling, incidenten, alerts, dashboard-API) en de Angular-frontend (markt, prijsgrafieken, portfolio) staan, met CI via GitHub Actions. Authenticatie volgt; tot dan hoort alles bij een demo-gebruiker. Zie [`docs/architecture.md`](docs/architecture.md) voor de ontwikkelvolgorde.
 
 ## Workflow
 
@@ -111,6 +114,6 @@ Checks ouder dan 30 dagen worden dagelijks opgeruimd; incidenten blijven bewaard
 | Job | Wat | Lokaal hetzelfde |
 |---|---|---|
 | `checks` | Lint, typecheck, unittests en build | `pnpm lint && pnpm typecheck && pnpm test && pnpm build` |
-| `e2e` | Playwright-API-tests met Postgres en Mailpit als service-containers | `pnpm db:up && pnpm test:e2e` |
+| `e2e` | Playwright-API- en browsertests met Postgres en Mailpit als service-containers | `pnpm db:up && pnpm test:e2e` |
 
 Faalt `e2e`, dan staat het Playwright-rapport 7 dagen als artifact (`playwright-report`) bij de run op GitHub.
